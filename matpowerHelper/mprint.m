@@ -74,8 +74,10 @@ classdef mprint
 				
 				
 				if ~message.success || printSuccesses,
-					fprintf('\tFault %d; Branches %s\n', message.faultNum, sprintf('%d ', message.faults));
-					fprintf('\t\t island %2d, success: %s: %s\n\n', message.islandNum,mprint.ternary(message.success, 'true', 'false'), message.text);
+                    
+%                     elStart = regexp(message.faults, '\['); elStart = elStart(1);
+					fprintf('\tFault %d; %s\n', message.faultNum, message.faults);
+					fprintf('\t\t island %7s, success: %s: %s\n\n', message.islandNum,mprint.ternary(message.success, 'true', 'false'), message.text);
 				end
 			end
 			

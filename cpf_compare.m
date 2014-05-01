@@ -8,21 +8,24 @@ function [CPFloads, messages, faults, base, baseLoad] = cpf_compare(base)
 	
 	baseLoad = getLoad(base, baseLambda);
 
-	
+% 	profile on
 	faults = defineFaults(base);
+%     profile viewer
 	nFaults = length(faults);
 	ppm = ParforProgMon('Running CPF on Faults: ', nFaults, floor(nFaults/100));
 
 	CPFloads = zeros(1, nFaults);
 	messages = [];
+    msg = [];
 	
-	parfor faultNum = 1:length(faults),
-% 	for faultNum = 1080,
+%     for faultNum = 1:length(faults),
+% 	parfor faultNum = 1:length(faults),
+	for faultNum = 42,
 		fprintf('Fault %d of %d\n', faultNum, nFaults);
 		ppm.update(faultNum);
 		
 		try
-			[CPFloads(faultNum), msg] = faultCPF(base, faultNum, faults{faultNum});
+			[CPFloads(faultNum), msg] = faultCPF(base, faults{faultNum});
 		catch err
 			rethrow(addCause(err, MException('CPF:CPFfault', sprintf('Error faulting case %d', faultNum))));			
 		end
@@ -33,8 +36,8 @@ function [CPFloads, messages, faults, base, baseLoad] = cpf_compare(base)
 	pause(0.2); ppm.delete();
 end
 
-function [load, messages, results] = faultCPF(base,faultNum,fault)
-
+function [load, messages, results] = faultCPF(base,fault)
+    
 	fprintf('\tFaulting Case\n');
 	myCase = fault.applyto(base);
 
@@ -46,7 +49,8 @@ function [load, messages, results] = faultCPF(base,faultNum,fault)
 	fprintf('\tRunning CPF\n');
 	results = [];
 	loads = zeros(1, length(myCase));
-	for i = 1:length(myCase),
+    nIslands = length(myCase);
+	for i = 1:nIslands,
 		if length(myCase) > 1, fprintf('\t\tSubcase %d\n', i); end
 		
 		%case where loads are isolated and have to be shed
@@ -93,9 +97,9 @@ function [load, messages, results] = faultCPF(base,faultNum,fault)
 		if nargin<2, success = true; end
 
 		message.text = text;
-		message.faultNum =faultNum;
+		message.faultNum =fault.id;
 		message.faults = fault.print();
-		message.islandNum = i;
+		message.islandNum = sprintf('%d / %d',i, nIslands);
 		message.success = success;
 
 	end

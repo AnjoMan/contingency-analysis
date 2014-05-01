@@ -6,12 +6,12 @@ function gridPlot(base, busX, busY, faults)
 	end
 	if isfield(base, 'Xpos') && isfield(base, 'Ypos'),
 		if nargin<2,
-			busX = base.Xpos;
-			busY = base.Ypos;
+			busX = base.bus_geo(:,1);
+			busY = base.bus_geo(:,2);
 		else
 			if length(busX) ~= length(base.bus(:,1)) && length(busY) ~= length(base.bus(:,1)),
-				busX = base.Xpos;
-				busY = base.Ypos;
+				busX = base.bus_geo(:,1);
+                busY = base.bus_geo(:,2);
 			end
 		
 		end

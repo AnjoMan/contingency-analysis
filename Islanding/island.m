@@ -167,8 +167,13 @@ classdef island
 			end
 
 
-			if figures && isfield(mCase, 'fault'), figure; gridPlot(rmfield(mCase,'fault')); end
-
+% 			if figures && isfield(mCase, 'fault'), figure; gridPlot(rmfield(mCase,'fault')); end
+            
+            if figures, 
+                close all; 
+                figure;
+                set(gca,'YDir','reverse');
+            end
 
 
 			[nBusses,~] = size(mCase.bus);
@@ -202,6 +207,10 @@ classdef island
 
 			currentBus = randi(nBusses); %pick a random bus to start on
 			while(currentBus > 0),
+                
+                if currentBus == 29,
+                    keyboard
+                end
 
 
 				if visitBus(currentBus), %bus has been visited, find its network
@@ -221,9 +230,9 @@ classdef island
 
 
 				if figures, hold on; 
-% 					scatter(mCase.Xpos(currentBus), mCase.Ypos(currentBus), 'r', 'Linewidth', 2); 
 					scatter(mCase.bus_geo(currentBus,1), mCase.bus_geo(currentBus,2), 'r', 'Linewidth', 2);
-					hold off; pause(timeDelay); end
+					hold off; pause(timeDelay); 
+                end
 					%highlight node on map
 
 
@@ -232,7 +241,7 @@ classdef island
 
 				% Traverse to next bus
 
-				branches = mCase.branch(:,1) == currentBus | mCase.branch(:,2) == currentBus;
+				branches = mCase.branch(:,1) ==currentBus | mCase.branch(:,2) == currentBus;
 					%get all branches connected to this bus
 
 				branchIndices = find(branches & ~traversedBranch);
@@ -247,7 +256,11 @@ classdef island
 						hold on; 
 % 						plot(mCase.Xpos([currentBus, nextBus]), mCase.Ypos([currentBus, nextBus]), 'r', 'Linewidth', 2); 
 						try
-							plot(mCase.bus_geo([currentBus, nextBus],[1,1]), mCase.bus_geo([currentBus, nextBus],[2,2]), 'r', 'Linewidth', 2);
+                            branch_geo = mCase.branch_geo{branchIndices(branch)};
+                            for i = 1:size(branch_geo,1)-1,
+                               plot(branch_geo(i:i+1,1), branch_geo(i:i+1,2), 'r', 'Linewidth',2); 
+                            end
+% 							plot(mCase.bus_geo([currentBus, nextBus],[1,1]), mCase.bus_geo([currentBus, nextBus],[2,2]), 'r', 'Linewidth', 2);
 						catch
 							keyboard
 						end

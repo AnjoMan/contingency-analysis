@@ -3,7 +3,7 @@
 %% Run CPFs
 tic;
 base = loadcase('case30_mod.mat');
-% base = loadcase('case118mod.mat');
+% base = loadcase('case118_mod.mat');
 [CPFloads, messages,branchFaults, base, baseLoad] = cpf_compare(base);
 
 
@@ -17,14 +17,36 @@ else
 	fprintf('CPF completed in %.3f seconds\n', time);
 end
 
-%siimplify 'branchFaults' to structs (Python doesn't understand matlab
+%simplify 'branchFaults' to structs (Python doesn't understand matlab
 %objects)
-for i=1:length(branchFaults),
-	branchFaults{i} = branchFaults{i}.tostruct();
-end
+% for i=1:length(branchFaults),
+% 	branchFaults{i} = branchFaults{i}.tostruct();
+% end
 
 
 save cpfResults.mat CPFloads messages branchFaults base baseLoad
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 % 
 % %% Get graph ready

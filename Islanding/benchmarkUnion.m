@@ -51,8 +51,8 @@ delete(hWaitbar);
 fprintf('Builtin Union = %f\n', mean(timesA));
 
 fprintf('My Union = %f\n', mean(timesB));
-fprintf('My Union w/o fcall = %f\n', mean(timesC));
+fprintf('Fastset Union = %f\n', mean(timesC));
 
-fprintf('Speedup: %.2f\n', (mean(timesA)-mean(timesB))/mean(timesA)*100);
+% fprintf('Speedup: %.2f\n', (mean(timesA)-mean(timesB))/mean(timesA)*100);
 
-fprintf('Speedup w/o fcall: %.2f\n', (mean(timesA)-mean(timesC))/mean(timesA)*100);
+% fprintf('Speedup w/o fcall: %.2f\n', (mean(timesA)-mean(timesC))/mean(timesA)*100);

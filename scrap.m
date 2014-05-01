@@ -1,16 +1,16 @@
-function scrap()
-	try
-		runError(2);
-	catch err
-		err = addCause(err, MException('Scrap:ScrapError', 'This is a test error'));
-		throw(err);
-		fprintf('Error happened');
-	end
-end
+
+base = loadcase('case30_mod.mat')
 
 
 
-function out = runError(integ)
-	array = [];
-	out = array(integ);
+
+figure; hold on;
+scatter( base.bus_geo(:,1), base.bus_geo(:,2));
+
+for i = 1:length(base.branch_geo)
+   branch = base.branch_geo{i};
+   
+   for j = 1:size(branch,1)-1
+      plot(branch(j:j+1,1), branch(j:j+1,2)) 
+   end
 end
