@@ -183,12 +183,15 @@ classdef island
 
 			%% Set up some structures to track progress
 
-			visitBus = false(nBusses,1);
+			visitBus = false(nBusses,1); 
 			traversedBranch = false(nBranches,1);
 				%bool vectors to track which bus/branches have been visited
+                %these store by index, not by id
 
 			busNetworks = zeros(nBusses,1); 
-				%indicate the network the bus is in (zero indicates not processed)
+				%indicate the network the bus is in at any given time(zero indicates not processed)
+                %boolean for each entry in mCase.bus, entry index
+                %corresponds to index in mCase.bus
 
 			networks = {[]};
 				% to track how many isolated sub-networks we have and which busses 
@@ -204,15 +207,29 @@ classdef island
 			%% Traverse the network %%%
 
 			if verbose, fprintf('\n\nChecking Network for Islanding:\nTraversing the Network...\n===============================\n'); end
-
-			currentBus = randi(nBusses); %pick a random bus to start on
+    
+            if figures, %get the x/y limits of the figure:
+                Mins = min(mCase.bus_geo);
+                Maxs = max(mCase.bus_geo);
+                buffer = (Maxs - Mins) * 0.1;
+                Mins = Mins - buffer;
+                Maxs = Maxs + buffer;
+                xlim([Mins(1),Maxs(1)])
+                ylim([Mins(2),Maxs(2)])
+            end
+            
+            
+			currentBus = randi(nBusses); %pick a random bus to start on (currentBus represents the index, not the ID number of a bus)
+            currentBusID = mCase.bus(currentBus,1); %get the bus id associated with the current bus
+            
+            if figures, %draw the first node
+                hold on; 
+                plot(mCase.bus_geo(currentBus,1), mCase.bus_geo(currentBus,2), 'g.', 'markersize', 20);
+                text(mCase.bus_geo(currentBus,1)+5, mCase.bus_geo(currentBus,2)-5, sprintf('%d',currentBusID), 'Color', 'g');
+                hold off; pause(timeDelay * 6); 
+            end	
 			while(currentBus > 0),
                 
-                if currentBus == 29,
-                    keyboard
-                end
-
-
 				if visitBus(currentBus), %bus has been visited, find its network
 					% check if the branch's network is different from currentNetwork
 					if currentNetwork ~= busNetworks(currentBus), %different network, so merge the two
@@ -220,20 +237,18 @@ classdef island
 					end
 				else% visit the bus
 					visitBus(currentBus) = true; %mark current bus as visited
-
-% 					networks{currentNetwork}(end+1) = currentBus; %add bus to current network 
-					networks{currentNetwork} = [networks{currentNetwork} currentBus];
-
+					networks{currentNetwork} = [networks{currentNetwork} currentBus]; %should this eventually be busID?
 					busNetworks(currentBus) = currentNetwork; %mark bus's network number
 					if verbose, fprintf('\t%s\n',printNetworks(networks)); end
-				end
+                end
 
-
-				if figures, hold on; 
+                
+					
+				if figures, hold on; %highlight explored node on map
 					scatter(mCase.bus_geo(currentBus,1), mCase.bus_geo(currentBus,2), 'r', 'Linewidth', 2);
+                    text(mCase.bus_geo(currentBus,1)+5, mCase.bus_geo(currentBus,2)-5, sprintf('%d',currentBusID), 'Color', 'r','FontWeight', 'bold');
 					hold off; pause(timeDelay); 
                 end
-					%highlight node on map
 
 
 
@@ -241,41 +256,46 @@ classdef island
 
 				% Traverse to next bus
 
-				branches = mCase.branch(:,1) ==currentBus | mCase.branch(:,2) == currentBus;
-					%get all branches connected to this bus
+				branches = mCase.branch(:,1) ==currentBusID | mCase.branch(:,2) == currentBusID;
+					%get all branches connected to this bus - requires that
+					%we compare the bus IDs of each branch to the bus ID of
+					%the current bus
 
 				branchIndices = find(branches & ~traversedBranch);
 				if ~isempty(branchIndices), %there is atleast one untraversed branch leaving this node
 					branch = randi(length(branchIndices)); %pick a random branch
 
 					node = mCase.branch(branchIndices(branch),1:2);
-					nextBus = node(node ~=currentBus);
+					nextBusID = node(node ~=currentBusID); %gets the id of the next bus to be travelled to
 					traversedBranch(branchIndices(branch)) = true; %mark branch as traversed
 
-					if figures, 
+					if figures, %draw the branch
 						hold on; 
-% 						plot(mCase.Xpos([currentBus, nextBus]), mCase.Ypos([currentBus, nextBus]), 'r', 'Linewidth', 2); 
-						try
-                            branch_geo = mCase.branch_geo{branchIndices(branch)};
-                            for i = 1:size(branch_geo,1)-1,
-                               plot(branch_geo(i:i+1,1), branch_geo(i:i+1,2), 'r', 'Linewidth',2); 
-                            end
-% 							plot(mCase.bus_geo([currentBus, nextBus],[1,1]), mCase.bus_geo([currentBus, nextBus],[2,2]), 'r', 'Linewidth', 2);
-						catch
-							keyboard
-						end
-						hold off; 	 pause(timeDelay); end
-					 %mark traversed path;
-
-					currentBus = nextBus; %update bus.
+						branch_geo = mCase.branch_geo{branchIndices(branch)};
+                        for i = 1:size(branch_geo,1)-1,
+                           plot(branch_geo(i:i+1,1), branch_geo(i:i+1,2), 'r', 'Linewidth',2); 
+                        end
+                        
+                        
+                        [x,y] = mplot.midpoint(branch_geo);
+%                         scatter(x,y,10,'rd', 'fill')
+%                         text(x+1,y-5, sprintf('%d',branchIndices(branch)), 'Color', 'r', 'FontName', 'courier');
+						hold off; 	 pause(timeDelay); 
+                    end	%mark traversed path;
+                    
+                    %move to next bus:
+                    currentBus = find(mCase.bus(:,1) == nextBusID); %get the index corresponding to bus with ID of nextBusID
+                    currentBusID = mCase.bus(currentBus,1);
+                    
 				else % all branches have been traversed, so try to find an unvisited node
 					unVisited = find(~visitBus); %get all unvisited busses
 
 					if isempty(unVisited), %all nodes have been visited
 						currentBus = -1; %causes while loop to exit
 					else		
-						bus = randi(length(unVisited)); 
+						bus = randi(length(unVisited)); %pick a random index for a next bus
 						currentBus = unVisited(bus); %update bus
+                        currentBusID = mCase.bus(currentBus,1);
 						
 % 						networks{end+1} = []; %add new empty network
 						networks = [networks {[]}];
@@ -284,7 +304,6 @@ classdef island
 
 						if figures, 
 							hold on; 
-% 							plot(mCase.Xpos(currentBus), mCase.Ypos(currentBus), 'g.', 'markersize', 20);
 							plot(mCase.bus_geo(currentBus,1), mCase.bus_geo(currentBus,2), 'g.', 'markersize', 20);
 							hold off; pause(timeDelay * 6); 
 						end		
@@ -296,23 +315,31 @@ classdef island
 			if verbose, fprintf('\n\nChecking remaining branches...\n=================================\n'); end
 
 			remainingBranches = find(~traversedBranch);
-
+            
 			for branchNum = remainingBranches(:)'
 				if verbose, fprintf('\tChecking Branch %d.', branchNum); end
 
 				node = mCase.branch(branchNum, 1:2); %get nodes connected by branch
+                node(1) = find(mCase.bus(:,1) == node(1));%convert to indexes
+                node(2) = find(mCase.bus(:,1) == node(2));
 				if busNetworks(node(1)) ~= busNetworks(node(2)), %bus networks are different
 					if verbose, fprintf('\tMerging networks %d and %d.',busNetworks(node(1)), busNetworks(node(2))); end;
 					mergeNetworks(busNetworks(node(1)), busNetworks(node(2)));
 				end
 
 				if verbose, fprintf('\n'); end
-				if figures, 
-% 					hold on; p = plot(mCase.Xpos(node), mCase.Ypos(node), 'r', 'Linewidth', 2); 
-					hold on; p = plot(mCase.bus_geo(node, 1), mCase.bus_geo(node,2), 'r', 'Linewidth', 2);
-					set(p, 'Color',[224,103,27]/256);  
-					hold off; 	 
-					pause(timeDelay); 
+				if figures,
+                    hold on; 
+                    branch_geo = mCase.branch_geo{branchNum};
+                    for br = 1:size(branch_geo,1)-1,
+                        p=plot(branch_geo(br:br+1,1), branch_geo(br:br+1,2), 'b', 'Linewidth',2); 
+                        set(p, 'Color',[215,103,27]/256);  
+                        [x,y] = mplot.midpoint(branch_geo);
+                        scatter(x,y,10,'bd', 'fill')
+%                         text(x+1,y-5, sprintf('%d',branchNum), 'Color', 'b', 'FontName', 'courier');
+                    end
+
+                    hold off; 	 pause(timeDelay);
 				end
 			end
 
@@ -329,14 +356,13 @@ classdef island
 			[~,indices] = sort(lengths, 'descend');
 			networks = networks(indices);
 
-
 			function out = printNetworks(myNetworks)
 			%returns a string output of 'networks'
 				out = '';
-				for i = 1:length(myNetworks)
-					sublist = myNetworks{i};
-					sublist = sprintf('%d ', sublist);
-					out = [out, [sprintf('%d:[',i), sublist(1:end-1), ']'], '   '];
+				for network = 1:length(myNetworks)
+					sublist = myNetworks{network};
+					sublist = sprintf('%d ', mCase.bus(sublist,1));
+					out = [out, [sprintf('%d:[',network), sublist(1:end-1), ']'], '   '];
 				end
 			end
 

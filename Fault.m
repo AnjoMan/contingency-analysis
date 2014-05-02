@@ -116,12 +116,12 @@ classdef Fault
 				markBranch = zeros(1,nBranches);
 				markGen = zeros(1,nGens);
 				busIndices = [];
-				for bus = obj.bus(:)',%because of no 'for each in x:', you have to ensure the orientation of array
+				for mBus = bus(:)',%because of no 'for each in x:', you have to ensure the orientation of array
 					for branch = 1:nBranches %mark branch if it connects to a node with id of bus
-						markBranch(branch) =  markBranch(branch) || ismember(base.bus(bus,1), base.branch(branch, 1:2));
+						markBranch(branch) =  markBranch(branch) || ismember(base.bus(mBus,1), base.branch(branch, 1:2));
 					end
 					for gen = 1:nGens
-						markGen(gen) = markGen(gen) || ismember(base.bus(bus,1), base.gen(gen,1));
+						markGen(gen) = markGen(gen) || ismember(base.bus(mBus,1), base.gen(gen,1));
 					end
 
 					
@@ -142,65 +142,16 @@ classdef Fault
 			nBusses = size(base.bus,1);
             try nTrans = length(base.trans); catch nTrans = 0; end
 			
-% 			%take care of any transformer faults
-% 			if ~isempty(obj.trans),
-% 				%from all transformer faults, gather up a list of branches,
-% 				%busses, and generators involved
-% 				tBusses = [];
-% 				tBranches = [];
-% 				tGens = [];
-% 				for transInd = obj.trans,
-% 					tBusses = [ tBusses base.trans{transInd}{2}];
-% 					tBranchBusses = base.trans{transInd}{1};
-% 					%from connecting busses get branch indices
-% 					for ind = 1:size(tBranchBusses,1),
-% 						tBranches = [tBranches find(tBranchBusses(ind,1) == base.branch(:,1) & tBranchBusses(ind,2) == base.branch(:,2))];
-% 						tBranches = [tBranches find(tBranchBusses(ind,2) == base.branch(:,1) & tBranchBusses(ind,1) == base.branch(:,2))];
-% 					end
-% 					tGens = [tGens base.trans{transInd}{3}];
-% 				end
-% 				
-% 				obj.bus = union(obj.bus, tBusses);
-% 				obj.branch = union(obj.branch, tBranches);
-% 				obj.gen = union(obj.gen, tGens);
-% 			end
-% 			
-% 			
-% 			
-% 			
-% 			%take care of bus faults
-% 			if ~isempty(obj.bus),
-% 				markBranch = zeros(1,nBranches);
-% 				markGen = zeros(1,nGens);
-% 				busIndices = [];
-% 				for bus = obj.bus(:)',%because of no 'for each in x:', you have to ensure the orientation of array
-% 					for branch = 1:nBranches %mark branch if it connects to a node with id of bus
-% 						markBranch(branch) =  markBranch(branch) || ismember(base.bus(bus,1), base.branch(branch, 1:2));
-% 					end
-% 					for gen = 1:nGens
-% 						markGen(gen) = markGen(gen) || ismember(base.bus(bus,1), base.gen(gen,1));
-% 					end
-% 
-% 					
-% 				end
-% 				obj.gen = union(obj.gen, find(markGen));
-% 				faultCase.bus = base.bus( setdiff(1:nBusses, busIndices),:);
-% 				obj.branch = union( obj.branch, find(markBranch));
-% 			end
-% 			
             [mBranch, mBus, mGen, mTrans] = obj.consolidate(base);
+            
+            
             
             %remove busses from faultCase
             if ~isempty(mBus)
-                faultCase.bus = base.bus( setdiff(1:nBusses, mBus),:);
+                faultCase.bus = base.bus( setdiff(1:nBusses, mBus),:); %remove busses
+                faultCase.bus_geo = base.bus_geo( setdiff(1:nBusses,mBus),:); %remove corresponding geographic entries
             end
-            
-            
-            
-            
-            
-            
-            
+                        
 			%take care of any generator faults
 			if ~isempty(mGen),
 				faultCase.gen = base.gen( setdiff(1:nGens, mGen),:);

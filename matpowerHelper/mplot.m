@@ -22,7 +22,7 @@ classdef mplot
                %label branches
                [x,y] = mplot.midpoint(branch);
                scatter(x,y,10,'kd', 'fill')
-               text(x+1,y-5, sprintf('%d',branchNum), 'Color', 'k');
+               text(x+1,y-5, sprintf('%d',branchNum), 'Color', 'k', 'FontName', 'courier');
             end
             
             %plot busses
@@ -30,7 +30,7 @@ classdef mplot
             
             %label busses
             for i = 1:length(system.bus_geo),               
-               text( system.bus_geo(i,1)+1, system.bus_geo(i,2)-5, sprintf('%d',i), 'Color', 'b'); 
+               text( system.bus_geo(i,1)+1, system.bus_geo(i,2)-5, sprintf('%d',i), 'Color', 'b', 'FontWeight', 'bold'); 
             end
             hold off;
            
@@ -91,7 +91,7 @@ classdef mplot
             scatter(system.bus_geo(busses,1), system.bus_geo(busses,2),'r', 'fill');
             %label busses
             for bu = busses,               
-               text( system.bus_geo(bu,1)+1, system.bus_geo(bu,2)-5, sprintf('%d',bu), 'Color', 'r'); 
+               text( system.bus_geo(bu,1)+1, system.bus_geo(bu,2)-5, sprintf('%d',bu), 'Color', 'r', 'FontWeight', 'bold'); 
             end
             
             
