@@ -113,16 +113,18 @@ classdef Fault
             
             %take care of bus faults
 			if ~isempty(bus),
-				markBranch = zeros(1,nBranches);
-				markGen = zeros(1,nGens);
+				markBranch = zeros(nBranches,1);
+				markGen = zeros(nGens,1);
 				busIndices = [];
 				for mBus = bus(:)',%because of no 'for each in x:', you have to ensure the orientation of array
-					for mBranch = 1:nBranches %mark branch if it connects to a node with id of bus
-						markBranch(mBranch) =  markBranch(mBranch) || ismember(base.bus(mBus,1), base.branch(mBranch, 1:2));
-					end
-					for mGen = 1:nGens
-						markGen(mGen) = markGen(mGen) || ismember(base.bus(mBus,1), base.gen(mGen,1));
-					end
+                    markBranch = markBranch | (base.branch(:,1) == mBus | base.branch(:,2) == mBus);
+% 					for mBranch = 1:nBranches %mark branch if it connects to a node with id of bus
+% 						markBranch(mBranch) =  markBranch(mBranch) || ismember(base.bus(mBus,1), base.branch(mBranch, 1:2));
+% 					end
+                    markGen = markGen | mBus == base.gen(:,1);
+% 					for mGen = 1:nGens
+% 						markGen(mGen) = markGen(mGen) || ismember(base.bus(mBus,1), base.gen(mGen,1));
+% 					end
 
 					
 				end
@@ -161,10 +163,11 @@ classdef Fault
 			%take care of branches
 			if ~isempty(mBranch) ,
 				faultCase.branch = base.branch( setdiff( 1:nBranches, mBranch),:);
-				try faultCase.branch_geo = base.branch_geo( setdiff( 1:nBranches, mBranch)); catch end
-			end
+				faultCase.branch_geo = base.branch_geo( setdiff( 1:nBranches, mBranch));
+            end
 			
 			networks = island.find(faultCase,true,true); %get island groups
+%             networks = island.find(faultCase);
 			if length(networks)>1,
 				faultCases = island.resolve(faultCase, networks);
 			else

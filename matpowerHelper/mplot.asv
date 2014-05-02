@@ -38,7 +38,7 @@ classdef mplot
         end
         
         
-        function [x,y] = midpoint(branch_geo)
+        function [x,y] = midpoint(branch_geo),
             distances =[0; sqrt(sum((branch_geo(2:end,:) - branch_geo(1:end-1,:)).^2,2))]; %find distance between points
             cs = cumsum(distances);
 
@@ -55,11 +55,11 @@ classdef mplot
         
         function faulted(system, fault)
             
-            [mBranch,mBus,~,~] = fault.consolidate(system);
+            [mBranch,mBbus,~,~] = fault.consolidate(system);
             mplot.plot(system);
             
             hold on;
-%             transBranches = [];
+            transBranches = [];
 %             for trans = fault.trans
 %                 transformer = system.trans{trans};
 %                 transBranches = [transBranches transformer{1}];
@@ -76,7 +76,7 @@ classdef mplot
             
             
             
-            for br = mBranch(:)',
+            for br = branch,
                branchGeo = system.branch_geo{br};
                for node = 1:size(branchGeo,1)-1
                   plot(branchGeo(node:node+1,1), branchGeo(node:node+1,2), 'r');
@@ -88,9 +88,9 @@ classdef mplot
                text(x+1,y-5, sprintf('%d',br), 'Color', 'r');
             end
             
-            scatter(system.bus_geo(mBbus,1), system.bus_geo(mBus,2),'r', 'fill');
+            scatter(system.bus_geo(bus,1), system.bus_geo(busses,2),'r', 'fill');
             %label busses
-            for bu = mBus(:)',               
+            for bu = busses,               
                text( system.bus_geo(bu,1)+1, system.bus_geo(bu,2)-5, sprintf('%d',bu), 'Color', 'r', 'FontWeight', 'bold'); 
             end
             
