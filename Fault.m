@@ -112,16 +112,16 @@ classdef Fault
             end
             
             %take care of bus faults
-			if ~isempty(obj.bus),
+			if ~isempty(bus),
 				markBranch = zeros(1,nBranches);
 				markGen = zeros(1,nGens);
 				busIndices = [];
 				for mBus = bus(:)',%because of no 'for each in x:', you have to ensure the orientation of array
-					for branch = 1:nBranches %mark branch if it connects to a node with id of bus
-						markBranch(branch) =  markBranch(branch) || ismember(base.bus(mBus,1), base.branch(branch, 1:2));
+					for mBranch = 1:nBranches %mark branch if it connects to a node with id of bus
+						markBranch(mBranch) =  markBranch(mBranch) || ismember(base.bus(mBus,1), base.branch(mBranch, 1:2));
 					end
-					for gen = 1:nGens
-						markGen(gen) = markGen(gen) || ismember(base.bus(mBus,1), base.gen(gen,1));
+					for mGen = 1:nGens
+						markGen(mGen) = markGen(mGen) || ismember(base.bus(mBus,1), base.gen(mGen,1));
 					end
 
 					
