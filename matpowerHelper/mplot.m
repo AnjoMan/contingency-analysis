@@ -88,7 +88,7 @@ classdef mplot
                text(x+1,y-5, sprintf('%d',br), 'Color', 'r');
             end
             
-            scatter(system.bus_geo(mBbus,1), system.bus_geo(mBus,2),'r', 'fill');
+            scatter(system.bus_geo(mBus,1), system.bus_geo(mBus,2),'r', 'fill');
             %label busses
             for bu = mBus(:)',               
                text( system.bus_geo(bu,1)+1, system.bus_geo(bu,2)-5, sprintf('%d',bu), 'Color', 'r', 'FontWeight', 'bold'); 

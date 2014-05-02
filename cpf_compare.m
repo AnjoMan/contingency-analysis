@@ -20,7 +20,7 @@ function [CPFloads, messages, faults, base, baseLoad] = cpf_compare(base)
 	
 %     for faultNum = 1:length(faults),
 % 	parfor faultNum = 1:length(faults),
-	for faultNum = 47,
+	for faultNum = 66,
 		fprintf('Fault %d of %d\n', faultNum, nFaults);
 		ppm.update(faultNum);
 		

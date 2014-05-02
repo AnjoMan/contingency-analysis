@@ -323,11 +323,13 @@ classdef island
                 node(1) = find(mCase.bus(:,1) == node(1));%convert to indexes
                 node(2) = find(mCase.bus(:,1) == node(2));
 				if busNetworks(node(1)) ~= busNetworks(node(2)), %bus networks are different
-					if verbose, fprintf('\tMerging networks %d and %d.',busNetworks(node(1)), busNetworks(node(2))); end;
+					if verbose, fprintf('\n\t\tMerging networks %d and %d.\t',busNetworks(node(1)), busNetworks(node(2))); end;
 					mergeNetworks(busNetworks(node(1)), busNetworks(node(2)));
-				end
+                else
+                    if verbose, fprintf('\n'); end
+                end
 
-				if verbose, fprintf('\n'); end
+% 				if verbose, fprintf('\n'); end
 				if figures,
                     hold on; 
                     branch_geo = mCase.branch_geo{branchNum};
