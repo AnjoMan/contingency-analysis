@@ -166,8 +166,8 @@ classdef Fault
 				faultCase.branch_geo = base.branch_geo( setdiff( 1:nBranches, mBranch));
             end
 			
-			networks = island.find(faultCase,true,true); %get island groups
-%             networks = island.find(faultCase);
+% 			networks = island.find(faultCase,true,true); %get island groups
+            networks = island.find(faultCase);
 			if length(networks)>1,
 				faultCases = island.resolve(faultCase, networks);
 			else

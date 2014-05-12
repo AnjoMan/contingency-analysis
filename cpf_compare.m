@@ -12,7 +12,7 @@ function [CPFloads, messages, faults, base, baseLoad] = cpf_compare(base)
 	faults = defineFaults(base);
 %     profile viewer
 	nFaults = length(faults);
-	ppm = ParforProgMon('Running CPF on Faults: ', nFaults, floor(nFaults/100));
+	ppm = ParforProgMon('Running CPF on Fau`lts: ', nFaults, floor(nFaults/100));
 
 	CPFloads = zeros(1, nFaults);
 	messages = [];
@@ -20,7 +20,8 @@ function [CPFloads, messages, faults, base, baseLoad] = cpf_compare(base)
 	
 %     for faultNum = 1:length(faults),
 % 	parfor faultNum = 1:length(faults),
-	for faultNum = 66,
+	for faultNum =47,
+%     for faultNum = [47,50,53,66,79]
 		fprintf('Fault %d of %d\n', faultNum, nFaults);
 		ppm.update(faultNum);
 		
@@ -67,7 +68,14 @@ function [load, messages, results] = faultCPF(base,fault)
 		if size(myCase{i}.bus,1) == 1,
 			loads(i) = 0;
 			continue;
-		end
+        end
+        
+        
+        defaultResults.max_lambda = NaN;
+        defaultResults.predicted_list = [];
+        defaultResults.corrected_list = [];
+        defaultResults.combined_list = [];
+        defaultResults.success=false;
 		try
 			myCPFresults = cpf(myCase{i}, -1, sigmaForLambda, sigmaForVoltage, false);
 			if isnan(myCPFresults.max_lambda), 
@@ -80,12 +88,19 @@ function [load, messages, results] = faultCPF(base,fault)
 			end
 			
 			loads(i) = getLoad(myCase{i}, myCPFresults.max_lambda);
-		catch
-			keyboard;
+            
+            lambda = [lambda myCPFresults.max_lambda];
+            results = [results myCPFresults];
+		
+        catch err
+            lambda = [lambda 0];
+            results =  [results defaultResults];
+            messages = addMessage(messages, newMessage(errLine(err), false));
+% 			keyboard;
 		end
 	
-		lambda = [lambda myCPFresults.max_lambda];
-		results = [results myCPFresults];
+% 		lambda = [lambda myCPFresults.max_lambda];
+% 		results = [results myCPFresults];
 		
 	end
 	
@@ -118,5 +133,13 @@ function load = getLoad(myCase, lambda)
 
 end
 
+function errString = errLine(err)
+    errString =sprintf('%s in ', err.identifier);
+
+    for i = length(err.stack):-1:2
+       errString = [errString, sprintf(' %s: %d >', err.stack(i).name, err.stack(i).line)];
+    end
+    errString= [errString sprintf(' %s: %d; %s',err.stack(1).name, err.stack(1).line, err.cause{1}.message)];
+end
 
 
