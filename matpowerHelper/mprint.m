@@ -67,7 +67,7 @@ classdef mprint
 				message = messages(i);
 				
 				if strcmp(message.text, 'No loads'), nNoLoads = nNoLoads+1; end
-				if strcmp(message.text, 'CPF failed'), 
+				if strcmp(message.text, 'CPF failed') || ~message.success, 
 					nCPFfails = nCPFfails+1; end
 				if strcmp(message.text, 'No Generators'), nNoGens = nNoGens+1; end
 				if strcmp(message.text, 'CPF succeeded on island'), nCPFpass = nCPFpass+1; end

@@ -37,7 +37,7 @@ function faults = defineFaults(base)
 % 	[faults, columns] = combineFaults(2, singleBranchFaults, singleBusFaults, singleGenFaults);
 	[faults, columns] = combineFaults(levels, singleBranchFaults, singleBusFaults, singleGenFaults, singleTransFaults);
 	
-	fprintf('faults combined');
+	fprintf('faults combined\n');
 	singleFaults = [];
 	for i = 1:length(faults)
 		fault = faults{i};

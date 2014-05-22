@@ -165,9 +165,6 @@ classdef island
 				verbose = false;
 				figures = false;
 			end
-
-
-% 			if figures && isfield(mCase, 'fault'), figure; gridPlot(rmfield(mCase,'fault')); end
             
             if figures, 
                 close all; 
@@ -237,7 +234,7 @@ classdef island
 					end
 				else% visit the bus
 					visitBus(currentBus) = true; %mark current bus as visited
-					networks{currentNetwork} = [networks{currentNetwork} currentBus]; %should this eventually be busID?
+					networks{currentNetwork} = [networks{currentNetwork} currentBus]; %should this eventually be busID? yes, it should be converted at the end
 					busNetworks(currentBus) = currentNetwork; %mark bus's network number
 					if verbose, fprintf('\t%s\n',printNetworks(networks)); end
                 end
@@ -351,12 +348,18 @@ classdef island
 			if verbose,
 				fprintf('\n\nSummary:\n============\n');
 				fprintf('\tNumber of networks: %d\n', numIslands);
-			end
+            end
 
+            %sort networks by largest-first
 			lengths = zeros(1, length(networks));
 			for i = 1:length(networks), lengths(i) = length(networks{i}); end
 			[~,indices] = sort(lengths, 'descend');
+            
+            %for each network, convert to sorted list of bus ids
 			networks = networks(indices);
+            for i = 1:length(networks),
+                networks{i} = mCase.bus(sort(networks{i},1));
+            end
 
 			function out = printNetworks(myNetworks)
 			%returns a string output of 'networks'

@@ -58,22 +58,7 @@ classdef mplot
             [mBranch,mBus,~,~] = fault.consolidate(system);
             mplot.plot(system);
             
-            hold on;
-%             transBranches = [];
-%             for trans = fault.trans
-%                 transformer = system.trans{trans};
-%                 transBranches = [transBranches transformer{1}];
-%             end
-%             
-%             transBusses = [];
-%             for trans = fault.trans
-%                 transformer = system.trans{trans};
-%                 transBusses = [transBusses transformer{2}];
-%             end
-                
-%             branches = [branch transBranches];
-%             busses = [bus transBusses];
-            
+            hold on;            
             
             
             for br = mBranch(:)',

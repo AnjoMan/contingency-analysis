@@ -19,9 +19,9 @@ function [CPFloads, messages, faults, base, baseLoad] = cpf_compare(base)
     msg = [];
 	
 %     for faultNum = 1:length(faults),
-	parfor faultNum = 1:length(faults),
+% 	parfor faultNum = 1:length(faults),
 % 	for faultNum =47,
-%     for faultNum = [47,50,53,66,79]
+    for faultNum = [47,50,53,66,79]
 		fprintf('Fault %d of %d\n', faultNum, nFaults);
 		ppm.update(faultNum);
 		
@@ -139,13 +139,10 @@ function errString = errLine(err)
     for i = length(err.stack):-1:2
        errString = [errString, sprintf(' %s: %d >', err.stack(i).name, err.stack(i).line)];
     end
-    errString= [errString sprintf(' %s: %d; ',err.stack(1).name, err.stack(1).line)];
-    for i = 1:length(err.cause),
-       errString = [errString, sprintf(' %s; ', causeLine(err.cause{i}))]; 
-    end
+    errString= [errString sprintf(' %s: %d; %s',err.stack(1).name, err.stack(1).line, err.cause{1}.message)];
 end
 
 function causeString = causeLine(cause)
-    causeString = sprintf('%s: %s', cause.identifier, cause.message);
+    sprintf('%s; %s at %s');
 end
 

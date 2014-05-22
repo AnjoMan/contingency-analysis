@@ -1,4 +1,17 @@
 function   Lx = lagrangepoly(x, xs, ys)
+    % lagrangepoly	Extrapolate/Interpolate functions using lagrange polynomial.
+	%
+	% This function uses the lagrange polynomial formulation to perform interpolation
+	% or extrapolation via polynomial. It works by returning y = L(x), where L represents the lagrange 
+	% polynomial derived from x,xs and ys.
+	%
+	% inputs:
+	%  x: x-axis value for which you are seeking y value inter/extra-polation.
+	%  xs: x values corresponding to input functional values, in columns
+	%  ys: y data from which to extrapolate the output y=L(x), where L is the Lagrange Polynomial.
+	%      each column of ys is considered as a separate function, with one sample per column; thus xs and ys should 
+	%      have the same  number of columns, and y will have the same numer of rows as ys.
+
 
 	nSamples = length(xs);
 
