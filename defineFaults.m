@@ -4,7 +4,7 @@ function faults = defineFaults(base)
 	end
 % 	base = loadcase('case30_mod.mat');
 
-    levels =1;
+    levels =2;
 	nBranches = size(base.branch,1);
 	nBusses = size(base.bus,1);
 	nGens = size(base.gen,1);
